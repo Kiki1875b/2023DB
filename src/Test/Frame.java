@@ -198,7 +198,88 @@ public class Frame {
 	                }
                 }
                 
+                ArrayList<String[]> data = new ArrayList<String[]>();
+                ArrayList<String> columnNames = new ArrayList<String>();
+                
+                String[] nameArray = null;
+                String[] ssnArray = null;
+                String[] BdateArray = null;
+                String[] AddressArray = null;
+                String[] SexArray = null;
+                String[] SalaryArray = null;
+                String[] SuperArray = null;
+                String[] DnameArray = null;
+                
+                if(!name.equals("")) {
+                	nameArray = name.split("\n");
+                	columnNames.add("Name");
+                }
+                if(!ssn.equals("")) {
+                	ssnArray = ssn.split("\n");
+                	columnNames.add("Ssn");
+                }
+                if(!Bdate.equals("")) {
+                	BdateArray = Bdate.split("\n");
+                	columnNames.add("Bdate");
+                }
+                if(!Address.equals("")) {
+                	AddressArray = Address.split("\n");
+                	columnNames.add("Address");
+                }
+                if(!Sex.equals("")) {
+                	SexArray = Sex.split("\n");
+                	columnNames.add("Sex");
+                }
+                if(!Salary.equals("")) {
+                	SalaryArray = Salary.split("\n");
+                	columnNames.add("Salary");
+                }
+                if(!Supervisor.equals("")) {
+                	SuperArray = Supervisor.split("\n");
+                	columnNames.add("Supervisor");
+                }
+                if(!Dname.equals("")) {
+                	DnameArray = Dname.split("\n");
+                	columnNames.add("Department");
+                }
+                
+                
 
+                int maxLength = 0;
+                if (nameArray != null) maxLength = Math.max(maxLength, nameArray.length);
+                if (ssnArray != null) maxLength = Math.max(maxLength, ssnArray.length);
+                if (BdateArray != null) maxLength = Math.max(maxLength, BdateArray.length);
+                if (AddressArray != null) maxLength = Math.max(maxLength, AddressArray.length);
+                if (SexArray != null) maxLength = Math.max(maxLength, SexArray.length);
+                if (SalaryArray != null) maxLength = Math.max(maxLength, SalaryArray.length);
+                if (SuperArray != null) maxLength = Math.max(maxLength, SuperArray.length);
+                if (DnameArray != null) maxLength = Math.max(maxLength, DnameArray.length);
+                
+                for (int i = 0; i < maxLength; i++) {
+                    ArrayList<String> row = new ArrayList<String>();
+                    if (nameArray != null && i < nameArray.length) row.add(nameArray[i]);
+                    if (ssnArray != null && i < ssnArray.length) row.add(ssnArray[i]);
+                    if (BdateArray != null && i < BdateArray.length) row.add(BdateArray[i]);
+                    if (AddressArray != null && i < AddressArray.length) row.add(AddressArray[i]);
+                    if (SexArray != null && i < SexArray.length) row.add(SexArray[i]);
+                    if (SalaryArray != null && i < SalaryArray.length) row.add(SalaryArray[i]);
+                    if (SuperArray != null && i < SuperArray.length) row.add(SuperArray[i]);
+                    if (DnameArray != null && i < DnameArray.length) row.add(DnameArray[i]);
+                  
+                    
+                    data.add(row.toArray(new String[0]));
+                }
+                
+                String[][] rowData = data.toArray(new String[0][]);
+                String[] columnNamesArray = columnNames.toArray(new String[0]);
+
+                JTable table = new JTable(rowData, columnNamesArray);
+                JScrollPane scrollpane = new JScrollPane(table);
+                scrollpane.setBounds(30,150,1300,600);
+                frm.getContentPane().add(scrollpane);
+                frm.revalidate();
+                
+                
                 
             }
         });
@@ -209,6 +290,7 @@ public class Frame {
         frm.getContentPane().add(columnDropdown);
         frm.getContentPane().add(salaryInput);
         frm.setVisible(true);
+        
     }
     
     public static String findDName(Connection conn, String colName) throws SQLException {
@@ -318,6 +400,7 @@ public class Frame {
     		StringBuilder resultText = new StringBuilder();
     		while(resultSet.next()) {
     			String ssn = resultSet.getString("Dname");
+    		    
     			resultText.append(ssn).append("\n");
     		}
     		return resultText.toString();
@@ -326,14 +409,18 @@ public class Frame {
 
     public static String findSupervisor(Connection conn) throws SQLException{
     	try(Statement stmt = conn.createStatement()){
-    		String sql = "SELECT M.Fname FROM EMPLOYEE E, EMPLOYEE M WHERE E.Super_ssn = M.Ssn";
+    		String sql = "SELECT CASE WHEN E.Super_ssn IS NOT NULL THEN S.Fname ELSE E.Fname END AS SupervisorName FROM EMPLOYEE E LEFT JOIN EMPLOYEE S ON E.Super_ssn = S.Ssn";
     		ResultSet resultSet = stmt.executeQuery(sql);
     		
     		StringBuilder resultText = new StringBuilder();
     		while(resultSet.next()) {
-    			String ssn = resultSet.getString("Fname");
+    			String ssn = resultSet.getString("SupervisorName");
+
+    		    System.out.println(ssn + " ");
+
     			resultText.append(ssn).append("\n");
     		}
+    	
     		return resultText.toString();
     	}
     }
