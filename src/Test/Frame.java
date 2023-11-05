@@ -1,6 +1,7 @@
 package Test;
 
 import java.sql.Connection;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,8 +65,6 @@ public class Frame {
                 public void itemStateChanged(ItemEvent e) {
                     if (e.getStateChange() == ItemEvent.SELECTED) {
                         // 체크박스가 선택된 경우
-                    	
-                 
                         checkedItems[index] = 1;
                     } else {
                         // 체크박스 선택이 해제된 경우
@@ -106,6 +105,7 @@ public class Frame {
 	        	}
         	}
         }catch(SQLException e) {
+
         	
         }
         
@@ -133,7 +133,7 @@ public class Frame {
                     		salaryInput.setVisible(true);
                     	}
                     }catch(SQLException a) {
-                    	System.out.println("NON");
+
                     }
 
                 }
@@ -149,25 +149,22 @@ public class Frame {
             	if(scrollpane != null) {
             		frm.getContentPane().remove(scrollpane);
             	}
+            	
                 String[] cols = new String[8];
                 int count=0;
                 
                 String tableSelect = tableDropdown.getSelectedItem().toString(); 
                 String columnSelect = null;
                 
-                System.out.println(tableSelect);
+            
                 if(tableSelect == "부서" || tableSelect == "성별") {
                 	columnSelect = columnDropdown.getSelectedItem().toString();
                 }
-                
-                
                 if(tableSelect == "연봉") {
                 	columnSelect = salaryInput.getText();
                 	 
                 }
-               
-                
-               
+
                 for(int i = 0; i<8; i++) {
                     if(checkedItems[i] == 1) {
                     	count++;
@@ -180,8 +177,8 @@ public class Frame {
                 
                 String[] newCol = new String[count];
                 int temp = 0;
+                
                 for(int i = 0; i<8; i++) {
-                	
                 	if(cols[i] == "") continue;
                 	else {
                 		newCol[temp] = cols[i];
@@ -190,7 +187,6 @@ public class Frame {
                 }
                 
                 String name="";
-
                 String ssn = "";
                 String Bdate= "";
                 String Address = "";
@@ -203,9 +199,7 @@ public class Frame {
 
                
                 for(int i = 0; i<newCol.length; i++) {
-     
 	                try(Connection conn = Test.getConnection()){
-	                	
 	                	if(newCol[i] == "Name") {
 	                		name = findName(conn, tableSelect, columnSelect);
 	                	}else if(newCol[i] == "Ssn") {
@@ -274,8 +268,6 @@ public class Frame {
                 	DnameArray = Dname.split("\n");
                 	columnNames.add("Department");
                 }
-                
-                
 
                 int maxLength = 0;
                 if (nameArray != null) maxLength = Math.max(maxLength, nameArray.length);
@@ -305,7 +297,8 @@ public class Frame {
                 
                 
                 
-                System.out.println(Arrays.deepToString(data.toArray()));
+                
+              
                 
                 Object[][] rowData = data.toArray(new Object[0][]);
                 String[] columnNamesArray = columnNames.toArray(new String[0]);
@@ -335,18 +328,16 @@ public class Frame {
                         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                     }
                 };
-                //DefaultCellEditor editor = new DefaultCellEditor(new JCheckBox());
+
+                
                 table.getColumnModel().getColumn(CHECKBOX_COLUMN).setCellRenderer(renderer);
                 table.getColumnModel().getColumn(CHECKBOX_COLUMN).setCellEditor(new DefaultCellEditor(new JCheckBox()));
                 
                 
                 scrollpane = new JScrollPane(table);
-                scrollpane.setBounds(30,150,1300,600);
+                scrollpane.setBounds(30,150,1300,300);
                 frm.getContentPane().add(scrollpane);
                 frm.revalidate();
-                
-                
-                
             }
         });
         
@@ -629,6 +620,7 @@ public class Frame {
     		}else if(tName == "연봉") {
     			sql += " WHERE Salary >= " + Dname;
     		}
+    		
     		System.out.println(sql);
     		ResultSet resultSet = stmt.executeQuery(sql);
     		
@@ -644,7 +636,8 @@ public class Frame {
 
     public static String findSupervisor(Connection conn, String tName, String cName) throws SQLException{
     	try(Statement stmt = conn.createStatement()){
-    		String sql = "SELECT CASE WHEN E.Super_ssn IS NOT NULL THEN S.Fname ELSE E.Fname END AS SupervisorName FROM EMPLOYEE E LEFT JOIN EMPLOYEE S ON E.Super_ssn = S.Ssn";
+    		//String sql = "SELECT CASE WHEN E.Super_ssn IS NOT NULL THEN S.Fname ELSE E.Sex END AS SupervisorName FROM EMPLOYEE E LEFT JOIN EMPLOYEE S ON E.Super_ssn = S.Ssn";
+    		String sql = "SELECT Super_ssn FROM EMPLOYEE;";
     		if(tName == "부서" && cName != null) {
     			sql +=  " WHERE EXISTS(SELECT 1 FROM DEPARTMENT WHERE E.Dno = DEPARTMENT.Dnumber AND DEPARTMENT.Dname = '" + cName + "')";
     		}else if (tName == "성별" && cName != null) {
@@ -659,10 +652,9 @@ public class Frame {
     		
     		StringBuilder resultText = new StringBuilder();
     		while(resultSet.next()) {
-    			String ssn = resultSet.getString("SupervisorName");
-
+    			//String ssn = resultSet.getString("SupervisorName");
+    			String ssn = resultSet.getString("Super_ssn");
     		    System.out.println(ssn + " ");
-
     			resultText.append(ssn).append("\n");
     		}
     	
