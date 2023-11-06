@@ -53,7 +53,7 @@ public class Frame2 {
         JButton deleteButton = new JButton("삭제");
         
         
-        
+
         tableDropdown.setBounds(130, 30, 100, 30);
         columnDropdown.setBounds(240, 30, 100, 30); // 두 번째 드롭다운 메뉴의 가로 위치 조정
         salaryInput.setBounds(240,30,100,30);
@@ -205,7 +205,12 @@ public class Frame2 {
                 String where = " WHERE ";
                 String tableSelect = tableDropdown.getSelectedItem().toString(); 
                 String columnSelect = null;
-                
+                boolean entire = false;
+                if(tableSelect == "전체") {
+                	entire = true;
+                	
+                	
+                }
             
                 if(tableSelect == "부서" ) {
                 	columnSelect = columnDropdown.getSelectedItem().toString();
@@ -235,15 +240,23 @@ public class Frame2 {
                 for(int i = 1; i<checkedItems.length; i++) {
                 		
                 	if(checkedItems[i] == 1) {
-                		
+                		entire = false;
                 		select += " , ";
                 		
+                		select += checkBoxNames2[i];
+                	}
+              
+                }
+                
+                for(int i = 1; i<checkedItems.length; i++) {
+                	if(entire) {
+                		select += " , ";
                 		select += checkBoxNames2[i];
                 	}
                 }
                 
             	try(Connection conn = Test.getConnection()){
-            		search(conn, select, from, where);
+            		search(conn, select, from, where, entire);
             	}catch(SQLException a){
             		
             	}
@@ -408,7 +421,7 @@ public class Frame2 {
     	}
     }
     
-    public static void search(Connection conn, String sel, String fro, String whe) throws SQLException {
+    public static void search(Connection conn, String sel, String fro, String whe, boolean entire) throws SQLException {
     	try (Statement stmt = conn.createStatement()) {
     		final int CHECKBOX_COLUMN = 0;
             String sql = sel + " " + fro + " " + whe;
